@@ -1,3 +1,4 @@
 pyTelegramBotAPI~=4.4.0
-python-dotenv==0.20.0
-PyMySQL==1.0.2
+python-dotenv~=0.20.0
+PyMySQL~=1.0.2
+pytest~=7.1.2

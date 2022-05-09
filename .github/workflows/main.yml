@@ -1,0 +1,35 @@
+name: Pipeline
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  continuous-integration:
+    runs-on: ubuntu-latest
+    env:
+      TEST_BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
+      TEST_CHAT_ID: ${{ secrets.TEST_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.9.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9.9
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements_dev.txt
+
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-2
+
+#      - name: Run linter
+#        run: flake8 . --count --show-source --statistics
+
+      - name: Run tests
+        run: python -m pytest
