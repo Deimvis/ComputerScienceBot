@@ -2,6 +2,8 @@ name: Pipeline
 on:
   push:
     branches: [ main ]
+    tags-ignore:
+      - v*
 
 jobs:
   continuous-integration:
