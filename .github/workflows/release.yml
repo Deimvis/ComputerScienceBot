@@ -39,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip3 install -r requirements_dev.txt
+          pip3 install -r requirements-dev.txt
 
 #      - name: Run linter
 #        run: flake8 . --count --show-source --statistics
