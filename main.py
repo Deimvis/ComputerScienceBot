@@ -5,7 +5,10 @@ import cs_bot.config as config
 import cs_bot.courses as courses
 import cs_bot.profile as profile
 import cs_bot.start as start
+from cs_bot.util.init_db import init_db
 
+
+init_db()
 connection = pymysql.connect(
     host=config.DB_HOST,
     port=config.DB_PORT,
@@ -14,6 +17,7 @@ connection = pymysql.connect(
     database=config.DB_NAME,
     cursorclass=pymysql.cursors.DictCursor
 )
+
 
 bot = telebot.TeleBot(config.BOT_TOKEN, parse_mode='HTML')
 courses.register_handlers(bot, connection)

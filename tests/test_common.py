@@ -28,6 +28,25 @@ def simple_start():
     bot.polling()
 
 
+def test_env():
+    assert isinstance(config.DB_HOST, str)
+    assert isinstance(config.FILES_DIR, str)
+    assert isinstance(config.BOT_TOKEN, str)
+    assert isinstance(config.DB_PORT, int)
+    assert isinstance(config.DB_USER, str)
+    assert isinstance(config.DB_PASSWORD, str)
+    assert isinstance(config.DB_NAME, str)
+    assert isinstance(config.DB_CACHE_SIZE, int)
+    assert isinstance(config.DB_CACHE_TTL, int)
+    assert isinstance(config.DB_MAX_ROW_COUNT_FOR_CACHE, int)
+    assert isinstance(config.MAX_USERS_ONLINE, int)
+
+
+def test_testenv():
+    assert isinstance(os.getenv('TEST_BOT_TOKEN'), str)
+    assert isinstance(os.getenv('TEST_DB_NAME'), str)
+
+
 def test_simple_start():
     try:
         p = multiprocessing.Process(target=simple_start)

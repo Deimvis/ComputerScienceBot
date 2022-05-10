@@ -12,6 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          envkey_DB_HOST: ${{ secrets.DB_HOST }}
+          envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          envkey_DB_USER: ${{ secrets.DB_USER }}
+          envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          envkey_DB_NAME: ${{ secrets.DB_NAME }}
+          envkey_DB_CACHE_SIZE: ${{ secrets.DB_CACHE_SIZE }}
+          envkey_DB_CACHE_TTL: ${{ secrets.DB_CACHE_TTL }}
+          envkey_DB_MAX_ROW_COUNT_FOR_CACHE: ${{ secrets.DB_MAX_ROW_COUNT_FOR_CACHE }}
+          envkey_MAX_USERS_ONLINE: ${{ secrets.MAX_USERS_ONLINE }}
+          directory: '.'
+          fail_on_empty: true
+
       - name: Set up Python 3.9.9
         uses: actions/setup-python@v3
         with:
@@ -20,13 +36,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip3 install -r requirements_dev.txt
-
-#      - name: Configure AWS credentials
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: us-east-2
 
 #      - name: Run linter
 #        run: flake8 . --count --show-source --statistics

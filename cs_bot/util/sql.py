@@ -126,7 +126,6 @@ class BaseMySQLDatabase(MySQLDatabaseInterface):
         return super().insert(BaseMySQLDatabase.Table.USER_ACTION, record, **kwargs)
 
 
-
 # init_db
 # CREATE DATABASE IF NOT EXISTS computer_science_bot;
 # CREATE TABLE IF NOT EXISTS user (

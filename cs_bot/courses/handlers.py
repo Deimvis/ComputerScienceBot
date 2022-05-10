@@ -36,6 +36,9 @@ def send_course_menu(bot, db, call):
 def send_sources_menu(bot, db, call):
     course = CallParser(call).get(1)
     sources = db.get_sources(course)
+    if len(sources) == 0:
+        text = 'Кажется, я ничего не смог найти.\nВозможно где-то сбои, попробуй повторить запрос позже.'
+        return bot.send_message(call.message.chat.id, text)
     text = '\n'.join(map(lambda source: source2str(source), sources))
     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=menu.build_source_menu(course))
 

@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 import telebot
 
 load_dotenv('.env')
+load_dotenv('.testenv')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+FILES_DIR = os.getenv('FILES_DIR')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = int(os.getenv('DB_PORT'))
 DB_USER = os.getenv('DB_USER')
