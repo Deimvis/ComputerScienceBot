@@ -51,12 +51,15 @@ def test_testenv():
 
 def test_simple_start():
     try:
-        p = multiprocessing.Process(target=simple_start)
-        p.start()
-        p.join(10)
-        assert p.is_alive()
-        p.terminate()
-        p.join()
+        simple_start()
+        import time
+        time.sleep(10)
+        # p = multiprocessing.Process(target=simple_start)
+        # p.start()
+        # p.join(10)
+        # assert p.is_alive()
+        # p.terminate()
+        # p.join()
     except Exception as e:
         pytest.fail('Bot did not start:\n{}'.format(e))
 
