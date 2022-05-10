@@ -2,7 +2,7 @@ name: Release CI/CD Pipeline
 on:
   push:
     tags:
-      - release v*
+      - v*
 
 jobs:
   continuous-integration:
