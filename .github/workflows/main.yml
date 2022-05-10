@@ -24,6 +24,7 @@ jobs:
           envkey_DB_CACHE_SIZE: ${{ secrets.DB_CACHE_SIZE }}
           envkey_DB_CACHE_TTL: ${{ secrets.DB_CACHE_TTL }}
           envkey_DB_MAX_ROW_COUNT_FOR_CACHE: ${{ secrets.DB_MAX_ROW_COUNT_FOR_CACHE }}
+          envkey_FILES_DIR: ${{ secrets.FILES_DIR }}
           envkey_MAX_USERS_ONLINE: ${{ secrets.MAX_USERS_ONLINE }}
           directory: '.'
           fail_on_empty: true

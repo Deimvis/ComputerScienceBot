@@ -16,6 +16,11 @@ def init_test_db():
     _exec(query)
 
 
+def drop_test_db():
+    query = f'DROP DATABASE IF EXISTS `{os.getenv("TEST_DB_NAME")}`'
+    _exec(query)
+
+
 def _exec(query):
     print(query)
     connection = pymysql.connect(
