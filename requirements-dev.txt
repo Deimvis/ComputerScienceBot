@@ -1,4 +1,6 @@
+Pillow~=9.1.0
 pyTelegramBotAPI~=4.4.0
 python-dotenv~=0.20.0
 PyMySQL~=1.0.2
+pymysql-pool~=0.3.7
 pytest~=7.1.2
