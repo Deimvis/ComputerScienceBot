@@ -1,0 +1,36 @@
+{
+    "background": {
+        "filename": "background.png"
+    },
+    "courses": {
+        "default_width": 350,
+        "default_height": 250,
+        "items": [
+            {
+                "course_title": "introduction_to_cs",
+                "filename": "introduction_to_cs.png",
+                "combine_mode": "alpha_composite",
+                "x_center": 205,
+                "y_center": 150
+            },
+            {
+                "course_title": "python",
+                "filename":  "python.png",
+                "x_center": 675,
+                "y_center": 235
+            },
+            {
+                "course_title": "algorithms",
+                "filename": "algorithms.png",
+                "x_center": 835,
+                "y_center": 530
+            },
+            {
+                "course_title": "discrete_math",
+                "filename": "discrete_math.png",
+                "x_center": 1160,
+                "y_center": 330
+            }
+        ]
+    }
+}

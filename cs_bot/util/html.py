@@ -1,7 +1,7 @@
 
 
-def html_hyperlink(title, url):
-    return f'<a href="{url}">{title}</a>'
+def html_href(title, href=''):
+    return f'<a href="{href}">{title}</a>'
 
 
 def html_bold(text):

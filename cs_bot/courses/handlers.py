@@ -1,10 +1,14 @@
+import random
 from telebot import types
 from cs_bot.util.callback import CallParser
 from cs_bot.util.html import html_bold
 from cs_bot.util.user_action import on_user_action
 from cs_bot.courses import menu
 from cs_bot.courses.util import (
+    Course,
+    get_available_courses,
     source2str,
+    course_menu_reaction,
     make_course_study_poll_seria,
     get_course_from_poll_seria
 )
@@ -16,19 +20,35 @@ _DEFAULT_POLL_TIMEOUT = 30
 @on_user_action(db_ind=1, data_ind=2, data_type=types.Message, add_user=True)
 def send_course_list_menu(bot, db, message):
     text = 'Выбирай курс'
-    bot.send_message(message.chat.id, text, reply_markup=menu.course_list_menu)
+    available_courses = get_available_courses(message.chat.id, db)
+    courses = sorted(Course.names(ordering=True), key=lambda course: 0 if course in available_courses else 1)
+    bot.send_message(message.chat.id, text, reply_markup=menu.build_course_list_menu(courses))
 
 
 @on_user_action(db_ind=1, data_ind=2, data_type=types.CallbackQuery)
 def return_course_list_menu(bot, db, call):
-    text = 'Не определился?'
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=menu.course_list_menu)
+    text = 'Новый курс - новые знания {}'.format(random.choices(['🧠', '🤯'], weights=[0.9, 0.1])[0])
+    available_courses = get_available_courses(call.message.chat.id, db)
+    courses = sorted(Course.names(ordering=True), key=lambda course: 0 if course in available_courses else 1)
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=menu.build_course_list_menu(courses))
 
 
 @on_user_action(db_ind=1, data_ind=2, data_type=types.CallbackQuery)
 def send_course_menu(bot, db, call):
     course = CallParser(call).get(1)
-    text = 'Как насчёт алгоритма захвата Вселенной? 🧐'
+    course_prerequisites = db.get_course_prerequisites(course, use_cache=True)
+    completed_courses = db.get_completed_courses(call.message.chat.id)
+    if not course_prerequisites.issubset(completed_courses):
+        text = '\n'.join([
+            'Для открытия данного курса необходимо пройти следующие курсы:',
+            '<b>' + '</b>\n<b>'.join(
+                map(lambda course: Course.beautify(course),
+                    course_prerequisites - completed_courses)) + '</b>',
+            'Посмотреть все зависимости курсов: /roadmap'
+        ])
+        return bot.edit_message_text(text, call.message.chat.id, call.message.message_id,
+                                     reply_markup=menu.unavailable_course_menu)
+    text = course_menu_reaction(course)
     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=menu.build_course_menu(course))
 
 
@@ -39,8 +59,10 @@ def send_sources_menu(bot, db, call):
     if len(sources) == 0:
         text = 'Кажется, я ничего не смог найти.\nВозможно где-то сбои, попробуй повторить запрос позже.'
         return bot.send_message(call.message.chat.id, text)
-    text = '\n'.join(map(lambda source: source2str(source), sources))
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=menu.build_source_menu(course))
+    sources.sort(key=lambda source: source['rank'], reverse=True)
+    text = '\n\n'.join(map(lambda source: source2str(source), sources))
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id,
+                          disable_web_page_preview=True, reply_markup=menu.build_source_menu(course))
 
 
 @on_user_action(db_ind=1, data_ind=3, data_type=types.CallbackQuery)

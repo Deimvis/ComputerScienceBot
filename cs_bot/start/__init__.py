@@ -5,8 +5,8 @@ from cs_bot.util.callback import CallChecker
 from cs_bot.util.sql import BaseMySQLDatabase
 
 
-def register_handlers(bot, connection):
-    db = BaseMySQLDatabase(connection)
+def register_handlers(bot, pool):
+    db = BaseMySQLDatabase(pool)
     bot.message_handler(commands=['start'])\
         (apply(bot, db)(handlers.send_start_menu))
     bot.callback_query_handler(lambda call: CallChecker(call).like('start'))\

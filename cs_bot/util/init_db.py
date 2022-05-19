@@ -5,24 +5,14 @@ from os.path import join as pj
 from cs_bot import config
 
 
-def init_db():
-    query = open(pj(config.FILES_DIR, 'init_db.sql'), 'r').read()
-    _exec(query)
-
-
-def init_test_db():
-    query = open(pj(config.FILES_DIR, 'init_db.sql'), 'r').read()
-    query = query.replace(f'`{config.DB_NAME}`', f'`{os.getenv("TEST_DB_NAME")}`')
-    _exec(query)
-
-
-def drop_test_db():
-    query = f'DROP DATABASE IF EXISTS `{os.getenv("TEST_DB_NAME")}`'
+def init_db(db_name):
+    query = open(pj(config.FILES_DIR, 'sql', 'init_db.sql'), 'r').read()
+    query = query.replace('{{ DB_NAME }}', db_name)
     _exec(query)
 
 
 def _exec(query):
-    print(query)
+    # print(query)
     connection = pymysql.connect(
         host=config.DB_HOST,
         port=config.DB_PORT,

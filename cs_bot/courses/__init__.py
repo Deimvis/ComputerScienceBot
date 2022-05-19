@@ -6,8 +6,8 @@ from cs_bot.courses.util import Course, is_course_study_poll_seria
 from cs_bot.courses.sql import CoursesMySQLDatabase
 
 
-def register_handlers(bot, connection):
-    db = CoursesMySQLDatabase(connection)
+def register_handlers(bot, pool):
+    db = CoursesMySQLDatabase(pool)
     poll_controller = PollSeriaController()
     bot.message_handler(commands=['courses'])\
         (apply(bot, db)(handlers.send_course_list_menu))

@@ -8,7 +8,7 @@ class CallChecker:
     def __init__(self, call, delim=_DEFAULT_DELIM):
         self._state = True
         self._call = call.data.split(delim)
-        print(self._call)
+        # print(self._call)
 
     def __bool__(self):
         return self._state

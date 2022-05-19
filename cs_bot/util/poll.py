@@ -1,4 +1,5 @@
 import json
+import random
 import time
 from collections import OrderedDict
 from cs_bot.util.lru_cache import LRUCache
@@ -22,11 +23,15 @@ class Poll:
         self._purpose = test_unit['purpose']
         self._difficulty = test_unit['difficulty']
         self._question = test_unit['question']
-        self._options = json.loads(test_unit['options'])
+        self._options = json.loads(test_unit['options'], strict=False)
         self._answer_ind = test_unit['answer_ind']
         self._explanation = test_unit['explanation']
+        self._has_picture = test_unit['has_picture']
+        self._picture = test_unit['picture']
         self._state = self.State.NOT_SENT
         self._user_answer_ind = None
+        if test_unit['shuffle_options']:
+            self._shuffle_options()
 
     @property
     def test_unit_id(self):
@@ -71,6 +76,13 @@ class Poll:
     def on_answer(self, user_answer_ind):
         self._user_answer_ind = user_answer_ind
         self._state = self.State.ANSWERED
+
+    def _shuffle_options(self):
+        is_answer_mask = [(i == self._answer_ind) for i in range(len(self._options))]
+        data = list(zip(self._options, is_answer_mask))
+        random.shuffle(data)
+        self._options, is_answer_mask = zip(*data)
+        self._answer_ind = is_answer_mask.index(True)
 
 
 class PollSeria:

@@ -13,9 +13,8 @@ class ProfileMySQLDatabase(BaseMySQLDatabase):
         def names():
             return get_class_attributes(ProfileMySQLDatabase.Table)
 
-    def __init__(self, connection):
-        super().__init__(connection)
-        self.connection = connection
+    def __init__(self, pool):
+        super().__init__(pool)
         self._validate_db()
 
     def get_course_count(self, **kwargs):

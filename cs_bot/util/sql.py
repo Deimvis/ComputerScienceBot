@@ -1,6 +1,6 @@
 import time
 from cs_bot.config import DB_CACHE_SIZE, DB_CACHE_TTL, DB_MAX_ROW_COUNT_FOR_CACHE
-from cs_bot.util.lru_cache import LRUCache, TimeBoundedLRUCache
+from cs_bot.util.lru_cache import TimeBoundedLRUCache
 
 
 class MySQLDatabaseForceMode:
@@ -15,12 +15,9 @@ class MySQLDatabaseForceMode:
         self._db._force = False
 
 
-# TODO:
-# __init__(self, connection, logger)
-# print every query and args in [def exec(self, query, *args):]
 class MySQLDatabaseInterface:
-    def __init__(self, connection, cache_size=DB_CACHE_SIZE, cache_ttl=DB_CACHE_TTL):
-        self.connection = connection
+    def __init__(self, pool, cache_size=DB_CACHE_SIZE, cache_ttl=DB_CACHE_TTL):
+        self.pool = pool
         self._cache = TimeBoundedLRUCache(max_size=cache_size, ttl=cache_ttl)
         self._max_row_count_for_cache = DB_MAX_ROW_COUNT_FOR_CACHE
 
@@ -28,18 +25,20 @@ class MySQLDatabaseInterface:
         return 'use_cache' in kwargs and kwargs['use_cache'] is True
 
     def _exec(self, query, *args):
-        with self.connection.cursor() as cursor:
+        connection = self.pool.get_connection()
+        with connection.cursor() as cursor:
             cursor.execute(query, [arg for arg in args])
-        self.connection.commit()
+        connection.commit()
+        connection.close()
         return cursor.rowcount, cursor.fetchall()
 
     def exec(self, query, *args, **kwargs):
-        print(query, args)
+        # print(query, args)
         query_cache_key = query + '#'.join(str(arg) for arg in args)
         if self._use_cache_mode(**kwargs) and query_cache_key in self._cache:
             query_result = self._cache[query_cache_key]
             if query_result is not None:
-                print('\tgot from cache')
+                # print('\tgot from cache')
                 return self._cache[query_cache_key]
         row_count, result = self._exec(query, *args)
         if row_count < self._max_row_count_for_cache:
@@ -74,6 +73,10 @@ class MySQLDatabaseInterface:
         query = f'SELECT * FROM `{table}` WHERE {condition}'
         return self.exec(query, *where.values(), **kwargs)
 
+    def select_all(self, table, **kwargs):
+        query = f'SELECT * FROM `{table}`'
+        return self.exec(query, **kwargs)
+
     def insert(self, table, record, **kwargs):
         schema = '(' + ', '.join(map(lambda key: f'`{key}`', record.keys())) + ')'
         values_schema = '(' + ','.join('%s' for key in record) + ')'
@@ -91,18 +94,14 @@ class MySQLDatabaseInterface:
         query = f'DELETE FROM {table} WHERE {condition}'
         return self.exec(query, *where.values(), **kwargs)
 
-    def close(self):
-        self.connection.close()
-
 
 class BaseMySQLDatabase(MySQLDatabaseInterface):
     class Table:
         USER = 'user'
         USER_ACTION = 'user_action'
 
-    def __init__(self, connection):
-        super().__init__(connection)
-        self.connection = connection
+    def __init__(self, pool):
+        super().__init__(pool)
 
     def has_user(self, chat_id, **kwargs):
         where = {'chat_id': chat_id}
