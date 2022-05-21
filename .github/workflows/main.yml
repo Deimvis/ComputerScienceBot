@@ -1,8 +1,6 @@
 name: Pipeline
 on:
   push:
-    tags-ignore:
-      - v*
     branches: [ main ]
 
 jobs:
