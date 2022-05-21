@@ -58,14 +58,24 @@ class TestUnitPurpose:
     COMPETE = 'compete'
 
 
-def get_available_courses(chat_id, db):
+def build_course_list_with_meta(chat_id, db):
+    def course_priority(available_courses, completed_courses):
+        def priority(course):
+            if course not in available_courses:
+                return 2
+            if course in completed_courses:
+                return 1
+            return 0
+        return priority
+
     course_prerequisites = db.get_all_courses_prerequisites(use_cache=True)
     completed_courses = db.get_completed_courses(chat_id)
     available_courses = set()
     for course in Course.names():
         if course_prerequisites[course].issubset(completed_courses):
             available_courses.add(course)
-    return available_courses
+    courses = sorted(Course.names(ordering=True), key=course_priority(available_courses, completed_courses))
+    return courses, available_courses, completed_courses
 
 
 def source2str(source):
@@ -95,7 +105,7 @@ def course_menu_reaction(course):
         Course.LINEAR_ALGEBRA: ['Если ты не можешь понять, что куб вывернут наизнанку, '
                                 'то нам и разговаривать не о чем!'],
         Course.PYTHON: ['...Питона приручить несложно, особенно маленького.\n'
-                       'Главное следить, чтобы он не рисовал пружину. 🐍']
+                        'Главное следить, чтобы он не рисовал пружину. 🐍']
     }
     return random.choice(reacts.get(course, ['Никогда не знаешь, что может в жизни пригодиться.']))
 
@@ -115,4 +125,3 @@ def get_course_from_poll_seria(poll_seria):
     for tag in poll_seria.tags:
         if tag in Course.names():
             return tag
-

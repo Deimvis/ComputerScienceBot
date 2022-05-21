@@ -1,5 +1,4 @@
 import cs_bot.start.handlers as handlers
-import cs_bot.start.menu as menu
 from cs_bot.util.apply import apply
 from cs_bot.util.callback import CallChecker
 from cs_bot.util.sql import BaseMySQLDatabase

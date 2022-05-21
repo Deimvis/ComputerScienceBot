@@ -8,5 +8,5 @@ def register_handlers(bot, pool):
     db = RoadmapMySQLDatabase(pool)
     bot.message_handler(commands=['roadmap'])\
         (apply(bot, db)(handlers.send_roadmap_menu))
-    bot.callback_query_handler(func=lambda call: CallChecker(call).like('roadmap', 'orig')) \
+    bot.callback_query_handler(func=lambda call: CallChecker(call).like('roadmap', 'orig'))\
         (apply(bot, db)(handlers.send_orig_roadmap_menu))

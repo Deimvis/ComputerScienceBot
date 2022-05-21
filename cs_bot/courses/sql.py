@@ -58,9 +58,9 @@ class CoursesMySQLDatabase(BaseMySQLDatabase):
         return super().replace(CoursesMySQLDatabase.Table.USER_COMPLETED_COURSE, record, **kwargs)
 
     def _validate_db(self):
-        tables = super().show_tables()
+        tables = super().show_tables(use_cache=True)
         for table in CoursesMySQLDatabase.Table.names():
             assert table in tables, f'Table {table} not found in database.'
         for course in Course.names():
             assert super().exists(CoursesMySQLDatabase.Table.COURSE, {'title': course}),\
-                    f'Course `{course}` not found in `{CoursesMySQLDatabase.Table.COURSE}`'
+                   f'Course `{course}` not found in `{CoursesMySQLDatabase.Table.COURSE}`'

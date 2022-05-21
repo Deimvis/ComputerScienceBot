@@ -108,3 +108,14 @@ INSERT INTO course_prerequisite (title, prerequisite) VALUES
     ('algorithms_2', 'discrete_math')
 ON DUPLICATE KEY UPDATE
     title=title; # on duplicate key do nothing
+
+CREATE EVENT IF NOT EXISTS cleanup_user_action
+    ON SCHEDULE EVERY 1 WEEK
+    DO DELETE FROM user_action
+    WHERE `ts` < (
+        SELECT `ts`
+        FROM user_action
+        ORDER BY `ts` DESC
+        LIMIT 1000000, 1
+    );
+

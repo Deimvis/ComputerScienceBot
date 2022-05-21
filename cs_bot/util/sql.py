@@ -1,25 +1,23 @@
 import time
 from cs_bot.config import DB_CACHE_SIZE, DB_CACHE_TTL, DB_MAX_ROW_COUNT_FOR_CACHE
+from cs_bot.util.get_class_attributes import get_class_attributes
 from cs_bot.util.lru_cache import TimeBoundedLRUCache
+from cs_bot.util.singleton import Singleton
 
 
-class MySQLDatabaseForceMode:
-    def __init__(self, db):
-        self._db = db
+class DBCache(TimeBoundedLRUCache, metaclass=Singleton):
+    def __init__(self, cache_size=DB_CACHE_SIZE, cache_ttl=DB_CACHE_TTL):
+        super().__init__(cache_size, cache_ttl)
+        self._max_row_count_for_cache = DB_MAX_ROW_COUNT_FOR_CACHE
 
-    def __enter__(self):
-        self._db._force = True
-        return self._db
-
-    def __exit__(self):
-        self._db._force = False
+    def would_store(self, result):
+        return len(result) < self._max_row_count_for_cache
 
 
 class MySQLDatabaseInterface:
-    def __init__(self, pool, cache_size=DB_CACHE_SIZE, cache_ttl=DB_CACHE_TTL):
+    def __init__(self, pool):
         self.pool = pool
-        self._cache = TimeBoundedLRUCache(max_size=cache_size, ttl=cache_ttl)
-        self._max_row_count_for_cache = DB_MAX_ROW_COUNT_FOR_CACHE
+        self._cache = DBCache()
 
     def _use_cache_mode(self, **kwargs):
         return 'use_cache' in kwargs and kwargs['use_cache'] is True
@@ -30,7 +28,7 @@ class MySQLDatabaseInterface:
             cursor.execute(query, [arg for arg in args])
         connection.commit()
         connection.close()
-        return cursor.rowcount, cursor.fetchall()
+        return cursor.fetchall()
 
     def exec(self, query, *args, **kwargs):
         # print(query, args)
@@ -40,8 +38,8 @@ class MySQLDatabaseInterface:
             if query_result is not None:
                 # print('\tgot from cache')
                 return self._cache[query_cache_key]
-        row_count, result = self._exec(query, *args)
-        if row_count < self._max_row_count_for_cache:
+        result = self._exec(query, *args)
+        if self._cache.would_store(result):
             self._cache[query_cache_key] = result
         return result
 
@@ -94,14 +92,24 @@ class MySQLDatabaseInterface:
         query = f'DELETE FROM {table} WHERE {condition}'
         return self.exec(query, *where.values(), **kwargs)
 
+    def has_event(self, where, **kwargs):
+        condition = ' and '.join(map(lambda key: key + '=%s', where.keys()))
+        query = f'SHOW EVENTS WHERE {condition}'
+        return len(self.exec(query, *where.values(), **kwargs)) > 0
+
 
 class BaseMySQLDatabase(MySQLDatabaseInterface):
     class Table:
         USER = 'user'
         USER_ACTION = 'user_action'
 
+        @staticmethod
+        def names():
+            return get_class_attributes(BaseMySQLDatabase.Table)
+
     def __init__(self, pool):
         super().__init__(pool)
+        self._validate_db()
 
     def has_user(self, chat_id, **kwargs):
         where = {'chat_id': chat_id}
@@ -124,77 +132,10 @@ class BaseMySQLDatabase(MySQLDatabaseInterface):
         record = {'chat_id': chat_id, 'callback_data': callback_data, 'message': message, 'ts': int(time.time())}
         return super().insert(BaseMySQLDatabase.Table.USER_ACTION, record, **kwargs)
 
+    def _validate_db(self):
+        tables = super().show_tables(use_cache=True)
+        for table in BaseMySQLDatabase.Table.names():
+            assert table in tables, f'Table {table} not found in database.'
 
-# init_db
-# CREATE DATABASE IF NOT EXISTS computer_science_bot;
-# CREATE TABLE IF NOT EXISTS user (
-# chat_id BIGINT PRIMARY KEY,
-# username TEXT,
-# first_name TEXT,
-# last_name TEXT,
-# ts BIGINT,
-# ) DEFAULT CHARSET=UTF8MB4;
-# CREATE TABLE IF NOT EXISTS course (
-#     title VARCHAR(128) PRIMARY KEY,
-#     description VARCHAR(512)
-# ) DEFAULT CHARSET=UTF8MB4;
-# CREATE TABLE IF NOT EXISTS source (
-#     id INT PRIMARY KEY AUTO_INCREMENT,
-#     course_title VARCHAR(128) NOT NULL,
-#     url VARCHAR(4096) NOT NULL,
-#     title VARCHAR(128),
-#     description TEXT,
-#     `rank` INT,
-#     language VARCHAR(32),
-#     FOREIGN KEY (course_title)
-#         REFERENCES course (title)
-#         ON UPDATE RESTRICT
-#         ON DELETE RESTRICT
-# ) DEFAULT CHARSET=UTF8MB4;
-# CREATE TABLE IF NOT EXISTS test_unit (
-#     id INT PRIMARY KEY AUTO_INCREMENT,
-#     course_title VARCHAR(128),
-#     purpose VARCHAR(512) NOT NULL,
-#     difficulty VARCHAR(512),
-#     question TEXT NOT NULL,
-#     options TEXT NOT NULL COMMENT 'Json list',
-#     answer_ind INT NOT NULL,
-#     explanation VARCHAR(512),
-#     FOREIGN KEY (course_title)
-#         REFERENCES course (title)
-#         ON UPDATE RESTRICT
-#         ON DELETE RESTRICT
-# ) DEFAULT CHARSET=UTF8MB4;
-# CREATE TABLE IF NOT EXISTS user_completed_test_unit (
-#     chat_id BIGINT,
-#     test_unit_id INT,
-#     course_title VARCHAR(128),
-#     purpose VARCHAR(512) NOT NULL,
-#     difficulty VARCHAR(512),
-#     is_answer_correct BOOLEAN NOT NULL,
-#     ts BIGINT NOT NULL,
-#     FOREIGN KEY (test_unit_id)
-#         REFERENCES test_unit (id)
-#         ON UPDATE RESTRICT
-#         ON DELETE RESTRICT,
-#     FOREIGN KEY (course_title)
-#         REFERENCES course (title)
-#         ON UPDATE RESTRICT
-#         ON DELETE RESTRICT
-# ) DEFAULT CHARSET=UTF8MB4;
-# CREATE TABLE IF NOT EXISTS user_completed_course (
-#     chat_id BIGINT,
-#     course_title VARCHAR(128),
-#     ts BIGINT NOT NULL,
-#     FOREIGN KEY (course_title)
-#         REFERENCES course (title)
-#         ON UPDATE RESTRICT
-#         ON DELETE RESTRICT
-# ) DEFAULT CHARSET=UTF8MB4;
-# CREATE TABLE IF NOT EXISTS user_action (
-#     chat_id BIGINT,
-#     callback_data VARCHAR(512),
-#     message VARCHAR(512),
-#     ts BIGINT NOT NULL
-# ) DEFAULT CHARSET=UTF8MB4;
-
+        where = {'Name': 'cleanup_user_action', 'Status': 'ENABLED'}
+        assert super().has_event(where, use_cache=True), 'No enabled event `cleanup_user_action`.'

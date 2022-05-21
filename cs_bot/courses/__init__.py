@@ -21,5 +21,3 @@ def register_handlers(bot, pool):
         (apply(bot, db, poll_controller)(handlers.send_test_menu))
     bot.poll_answer_handler(func=lambda call: is_course_study_poll_seria(poll_controller, call))\
         (apply(bot, db, poll_controller)(handlers.send_next_test_unit))
-
-

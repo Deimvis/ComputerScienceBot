@@ -41,8 +41,8 @@ jobs:
         run: |
           pip3 install -r requirements-dev.txt
 
-#      - name: Run linter
-#        run: flake8 . --count --show-source --statistics
+      - name: Run linter
+        run: flake8 . --count --show-source --statistics
 
       - name: Run tests
         run: python -m pytest

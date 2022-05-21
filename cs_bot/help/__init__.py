@@ -1,5 +1,4 @@
 import cs_bot.help.handlers as handlers
-import cs_bot.help.menu as menu
 from cs_bot.util.apply import apply
 from cs_bot.util.sql import BaseMySQLDatabase
 

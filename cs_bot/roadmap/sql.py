@@ -33,6 +33,6 @@ class RoadmapMySQLDatabase(BaseMySQLDatabase):
         return set(map(lambda record: record['course_title'], completed_courses))
 
     def _validate_db(self):
-        tables = super().show_tables()
+        tables = super().show_tables(use_cache=True)
         for table in RoadmapMySQLDatabase.Table.names():
             assert table in tables, f'Table {table} not found in database.'

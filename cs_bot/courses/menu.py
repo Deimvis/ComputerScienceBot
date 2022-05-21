@@ -3,11 +3,16 @@ from cs_bot.util.callback import CallBuilder
 from cs_bot.courses.util import Course
 
 
-def build_course_list_menu(courses):
+def build_course_list_menu(courses, available_courses, completed_courses):
     markup = types.InlineKeyboardMarkup()
     for course in courses:
-        button_with_course = types.InlineKeyboardButton(Course.beautify(course),
-                                                       callback_data=CallBuilder().make('courses', course))
+        prefix = ''
+        if course in completed_courses:
+            prefix = '✓ '
+        elif course not in available_courses:
+            prefix = '✗ '
+        button_with_course = types.InlineKeyboardButton(prefix + Course.beautify(course),
+                                                        callback_data=CallBuilder().make('courses', course))
         markup.add(button_with_course)
     button_return = types.InlineKeyboardButton('← Вернуться назад', callback_data=CallBuilder().make('start'))
     markup.add(button_return)

@@ -1,5 +1,4 @@
 import pymysql
-import os
 from pymysql.constants import CLIENT
 from os.path import join as pj
 from cs_bot import config
@@ -12,7 +11,6 @@ def init_db(db_name):
 
 
 def _exec(query):
-    # print(query)
     connection = pymysql.connect(
         host=config.DB_HOST,
         port=config.DB_PORT,

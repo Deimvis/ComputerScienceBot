@@ -1,35 +1,102 @@
 {
     "background": {
-        "filename": "background.png"
+        "filename": "background.png",
+        "width": 2000,
+        "height": 2000
     },
     "courses": {
-        "default_width": 350,
-        "default_height": 250,
+        "default": {
+            "width": 350,
+            "height": 250,
+            "combine_mode": "paste",
+            "check": {
+                "filename": "check.png",
+                "width": 70,
+                "height": 70,
+                "combine_mode": "paste"
+            }
+        },
         "items": [
             {
                 "course_title": "introduction_to_cs",
                 "filename": "introduction_to_cs.png",
                 "combine_mode": "alpha_composite",
                 "x_center": 205,
-                "y_center": 150
+                "y_center": 150,
+                "check": {
+                    "x_center": 377,
+                    "y_center": 158
+                }
             },
             {
                 "course_title": "python",
                 "filename":  "python.png",
                 "x_center": 675,
-                "y_center": 235
+                "y_center": 235,
+                "check": {
+                    "x_center": 886,
+                    "y_center": 225
+                }
             },
             {
                 "course_title": "algorithms",
                 "filename": "algorithms.png",
                 "x_center": 835,
-                "y_center": 530
+                "y_center": 530,
+                "check": {
+                    "x_center": 949,
+                    "y_center": 542
+                }
             },
             {
                 "course_title": "discrete_math",
                 "filename": "discrete_math.png",
                 "x_center": 1160,
-                "y_center": 330
+                "y_center": 330,
+                "check": {
+                    "x_center": 1319,
+                    "y_center": 361
+                }
+            },
+            {
+                "course_title": "linear_algebra",
+                "filename": "linear_algebra.png",
+                "x_center": 1710,
+                "y_center": 290,
+                "check": {
+                    "x_center": 1890,
+                    "y_center": 298
+                }
+            },
+            {
+                "course_title": "cpp",
+                "filename": "cpp.png",
+                "x_center": 370,
+                "y_center": 460,
+                "check": {
+                    "x_center": 437,
+                    "y_center": 538
+                }
+            },
+            {
+                "course_title": "calculus",
+                "filename": "calculus.png",
+                "x_center": 1450,
+                "y_center": 605,
+                "check": {
+                    "x_center": 1653,
+                    "y_center": 655
+                }
+            },
+            {
+                "course_title": "algorithms_2",
+                "filename": "algorithms_2.png",
+                "x_center": 675,
+                "y_center": 825,
+                "check": {
+                    "x_center": 851,
+                    "y_center": 860
+                }
             }
         ]
     }

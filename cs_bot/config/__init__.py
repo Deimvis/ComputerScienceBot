@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-import telebot
+
 
 load_dotenv('.env')
 load_dotenv('.testenv')

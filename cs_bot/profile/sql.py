@@ -24,8 +24,9 @@ class ProfileMySQLDatabase(BaseMySQLDatabase):
         return super().count_all(ProfileMySQLDatabase.Table.TEST_UNIT, **kwargs)
 
     def get_user_completed_course_count(self, chat_id, **kwargs):
+        distinct = 'course_title'
         where = {'chat_id': chat_id}
-        return super().count(ProfileMySQLDatabase.Table.USER_COMPLETED_COURSE, where, **kwargs)
+        return super().count_distinct(ProfileMySQLDatabase.Table.USER_COMPLETED_COURSE, distinct, where, **kwargs)
 
     def get_user_completed_test_unit_count(self, chat_id, **kwargs):
         where = {'chat_id': chat_id}
@@ -40,8 +41,7 @@ class ProfileMySQLDatabase(BaseMySQLDatabase):
         where = {'chat_id': chat_id}
         return super().count_distinct(ProfileMySQLDatabase.Table.USER_COMPLETED_TEST_UNIT, distinct, where, **kwargs)
 
-
     def _validate_db(self):
-        tables = super().show_tables()
+        tables = super().show_tables(use_cache=True)
         for table in ProfileMySQLDatabase.Table.names():
             assert table in tables, f'Table {table} not found in database.'

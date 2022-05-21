@@ -84,7 +84,7 @@ def test_simple_start():
 
 
 @pytest.fixture(scope='session', autouse=True)
-def on_finish():
+def prepare():
     drop_test_db()
     yield
     drop_test_db()

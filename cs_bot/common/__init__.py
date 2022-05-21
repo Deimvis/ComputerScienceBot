@@ -1,6 +1,5 @@
 import cs_bot.common.handlers as handlers
 from cs_bot.util.apply import apply
-from cs_bot.util.callback import CallChecker
 from cs_bot.util.sql import BaseMySQLDatabase
 from cs_bot.util.poll import PollSeriaController
 

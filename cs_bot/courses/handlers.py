@@ -6,7 +6,7 @@ from cs_bot.util.user_action import on_user_action
 from cs_bot.courses import menu
 from cs_bot.courses.util import (
     Course,
-    get_available_courses,
+    build_course_list_with_meta,
     source2str,
     course_menu_reaction,
     make_course_study_poll_seria,
@@ -19,18 +19,18 @@ _DEFAULT_POLL_TIMEOUT = 30
 
 @on_user_action(db_ind=1, data_ind=2, data_type=types.Message, add_user=True)
 def send_course_list_menu(bot, db, message):
-    text = 'Выбирай курс'
-    available_courses = get_available_courses(message.chat.id, db)
-    courses = sorted(Course.names(ordering=True), key=lambda course: 0 if course in available_courses else 1)
-    bot.send_message(message.chat.id, text, reply_markup=menu.build_course_list_menu(courses))
+    text = '"Ученик, который учится без желания, — это птица без крыльев."\n<i>Саади</i>'
+    courses, available_courses, completed_courses = build_course_list_with_meta(message.chat.id, db)
+    bot.send_message(message.chat.id, text,
+                     reply_markup=menu.build_course_list_menu(courses, available_courses, completed_courses))
 
 
 @on_user_action(db_ind=1, data_ind=2, data_type=types.CallbackQuery)
 def return_course_list_menu(bot, db, call):
     text = 'Новый курс - новые знания {}'.format(random.choices(['🧠', '🤯'], weights=[0.9, 0.1])[0])
-    available_courses = get_available_courses(call.message.chat.id, db)
-    courses = sorted(Course.names(ordering=True), key=lambda course: 0 if course in available_courses else 1)
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=menu.build_course_list_menu(courses))
+    courses, available_courses, completed_courses = build_course_list_with_meta(call.message.chat.id, db)
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id,
+                          reply_markup=menu.build_course_list_menu(courses, available_courses, completed_courses))
 
 
 @on_user_action(db_ind=1, data_ind=2, data_type=types.CallbackQuery)
