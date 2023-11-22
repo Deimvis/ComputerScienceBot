@@ -18,6 +18,10 @@ def _get_roadmap(db, chat_id):
 @on_user_action(db_ind=1, data_ind=2, data_type=types.Message, add_user=True)
 def send_roadmap_menu(bot, db, message):
     roadmap = _get_roadmap(db, message.chat.id)
+    # roadmap_bytes = io.BytesIO()
+    # roadmap.save(roadmap_bytes, 'PNG', quality='keep')
+    # roadmap_bytes.seek(0)
+    # bot.send_photo(message.chat.id, roadmap_bytes, reply_markup=menu.roadmap_menu)
     bot.send_photo(message.chat.id, roadmap, reply_markup=menu.roadmap_menu)
 
 

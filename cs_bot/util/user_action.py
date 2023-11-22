@@ -21,7 +21,7 @@ def on_user_action(db_ind=None, data_ind=None, data_type=None, add_user=False):
                 if data_type is types.Message:
                     message = data.text
                 if add_user is True:
-                    db.update_user(chat_id, username, first_name, last_name)
+                    db.update_user(chat_id, username, first_name, last_name, use_cache=True)
                 db.add_user_action(chat_id, callback_data, message)
             return func(*args, **kwargs)
         return wrapper

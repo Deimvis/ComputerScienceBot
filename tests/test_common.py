@@ -14,20 +14,6 @@ import cs_bot.start as start
 from cs_bot.util.init_db import init_db
 
 
-def drop_test_db():
-    connection = pymysql.connect(
-        host=config.DB_HOST,
-        port=config.DB_PORT,
-        user=config.DB_USER,
-        password=config.DB_PASSWORD,
-        cursorclass=pymysql.cursors.DictCursor
-    )
-    with connection.cursor() as cursor:
-        cursor.execute(f'DROP DATABASE IF EXISTS `{os.getenv("TEST_DB_NAME")}`')
-    connection.commit()
-    connection.close()
-
-
 def simple_start():
     init_db(os.getenv('TEST_DB_NAME'))
     pool = pymysqlpool.ConnectionPool(
@@ -81,10 +67,3 @@ def test_simple_start():
         p.join()
     except Exception as e:
         pytest.fail('Bot did not start:\n{}'.format(e))
-
-
-@pytest.fixture(scope='session', autouse=True)
-def prepare():
-    drop_test_db()
-    yield
-    drop_test_db()
